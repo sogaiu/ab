@@ -49,17 +49,17 @@
   (if (not tree-sitter-mode)
       (message "tree-sitter-mode must be enabled")
     (let* ((position (or position (point)))
-           (root (ts-root-node tree-sitter-tree))
+           (root (tsc-root-node tree-sitter-tree))
            (node
-            (ts-get-descendant-for-position-range root
-                                                  (position-bytes position)
-                                                  (position-bytes position)))
+            (tsc-get-descendant-for-position-range root
+                                                   (position-bytes position)
+                                                   (position-bytes position)))
            (target-node nil)
            (last-node nil))
       (while node
         (setq target-node last-node)
         (setq last-node node)
-        (setq node (ts-get-parent node)))
+        (setq node (tsc-get-parent node)))
       (or target-node last-node))))
 
 (defun ab-top-level-bounds-for (&optional position)
@@ -67,8 +67,8 @@
   (if (not tree-sitter-mode)
       (message "tree-sitter-mode must be enabled")
     (let ((node (ab-top-level-node-for (or position (point)))))
-      (list (ts-node-start-position node)
-            (ts-node-end-position node)))))
+      (list (tsc-node-start-position node)
+            (tsc-node-end-position node)))))
 
 ;;;###autoload
 (defun ab-select-top-level-for (&optional position)

@@ -73,10 +73,10 @@ If NODE-TYPE is nil, return the smallest syntax node at point."
       (message "tree-sitter-mode must be enabled")
     (let* ((position (or position (point)))
            (tl-node (ab-top-level-node-for
-                     (ts-node-start-position
+                     (tsc-node-start-position
                       (ab-tree-sitter-node-at-pos position)))))
       (when (and tl-node
-                 (eq (ts-node-type tl-node)
+                 (eq (tsc-node-type tl-node)
                      'extra_defs))
         (when-let ((params-node
                     (tsc-get-child-by-field tl-node :parameters)))
@@ -85,7 +85,7 @@ If NODE-TYPE is nil, return the smallest syntax node at point."
             (while node
               ;; XXX: don't save & and a few other things?
               (setq pnode-names
-                    (cons (ts-node-text node)
+                    (cons (tsc-node-text node)
                           pnode-names))
               (setq node (tsc-get-next-named-sibling node)))
             pnode-names))))))
