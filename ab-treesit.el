@@ -77,7 +77,23 @@
     (error
      (message "Error: %s %s" (car err) (cdr err)))))
 
-;; XXX: try to match width as well
+(defun ab-longest-line-length (start end)
+  "Find the longest line length for lines related to START and END."
+  (let* ((longest 0)
+         (first-line (line-number-at-pos start))
+         (last-line (line-number-at-pos end))
+         (current-line first-line))
+    (save-excursion
+      (goto-char start)
+      (while (<= current-line last-line)
+        (let ((current-length
+               (- (line-end-position) (line-beginning-position))))
+          (when (< longest current-length)
+            (setq longest current-length)))
+        (setq current-line (1+ current-line))
+        (forward-line)))
+    longest))
+
 ;;;###autoload
 (defun ab-match-frame-to-top-level-for (&optional position)
   "Match the frame to the bounds of top level form containing POSITION."
@@ -85,11 +101,12 @@
   (condition-case err
       (cl-destructuring-bind (start end) (ab-top-level-bounds-for
                                           (or position (point)))
-        (set-frame-parameter (selected-frame) 'menu-bar-lines 0)
-	(set-frame-height (selected-frame)
-                          (+ (- (line-number-at-pos end)
-                                (line-number-at-pos start))
-                             4)) ; XXX: used to be 3, but changed when porting
+        (let ((width (ab-longest-line-length start end))
+              (height (+ (- (line-number-at-pos end)
+                            (line-number-at-pos start))
+                         5))) ; XXX: used to be 3, but changed when porting
+          (set-frame-parameter (selected-frame) 'menu-bar-lines 0)
+          (set-frame-size (selected-frame) width height))
         (let ((here (point)))
           (delete-other-windows)
           (goto-char start)
