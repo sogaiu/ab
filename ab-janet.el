@@ -57,6 +57,7 @@
 ;; XXX: var, var-, varglobal, default, dyn?
 (defvar ab-janet-def-forms
   (list 'def
+        'def-
         'defn
         'defn-
         'defglobal
