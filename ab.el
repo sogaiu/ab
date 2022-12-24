@@ -51,15 +51,15 @@
 
 After placing point within a def in Clojure, try:
 
-  (ab-sexp-bounds (list 'def))
+  (ab-sexp-bounds (list \\='def))
 
 or within a defn or defn-, try:
 
-  (ab-sexp-bounds (list 'defn 'defn-))
+  (ab-sexp-bounds (list \\='defn \\='defn-))
 
 or within a defun in Emacs Lisp, try:
 
-  (ab-sexp-bounds (list 'defun))
+  (ab-sexp-bounds (list \\='defun))
 
 Successful detection of the bounds should yield a list with 2 elements
 representing the start and end."
