@@ -113,7 +113,7 @@
           (recenter-top-bottom 0)
           (goto-char here)))
     (wrong-number-of-arguments
-     (message "Failed to find containing defn form."))
+     (message "Failed to find containing top-level form."))
     (error
      (message "Error: %s %s" (car err) (cdr err)))))
 
