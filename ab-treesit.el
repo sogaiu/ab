@@ -117,6 +117,62 @@
     (error
      (message "Error: %s %s" (car err) (cdr err)))))
 
+;; https://emacs.stackexchange.com/a/16825
+(defun ab-blank-line-p ()
+  "Check if current line is blank."
+  (= (current-indentation)
+     (- (line-end-position) (line-beginning-position))))
+
+(defun ab-blank-line-bounds-for (&optional position)
+  "Determine the blank-line-bounded lines containing POSITION."
+  (save-excursion
+    (let ((p (or position (point))))
+      (goto-char p)
+      (unless (ab-blank-line-p)
+        (let* (start
+               end)
+          (beginning-of-line)
+          (while (and (not (bobp))
+                      (not start))
+            (forward-line -1)
+            (when (ab-blank-line-p)
+              (setq start (point))))
+          (goto-char p)
+          (beginning-of-line)
+          (while (and (not (eobp))
+                      (not end))
+            (forward-line)
+            (when (ab-blank-line-p)
+              (setq end (point))))
+          (when (not start)
+            (setq start (point-min)))
+          (when (not end)
+            (setq end (point-max)))
+          (list start end))))))
+
+;;;###autoload
+(defun ab-match-frame-to-blank-line-bounded (&optional position)
+  "Match the frame to blank-line-boudned lines containing POSITION."
+  (interactive)
+  (condition-case err
+      (cl-destructuring-bind (start end) (ab-blank-line-bounds-for
+                                          (or position (point)))
+        (let ((width (ab-longest-line-length start end))
+              (height (+ (- (line-number-at-pos end)
+                            (line-number-at-pos start))
+                         5))) ; XXX: used to be 3, but changed when porting
+          (set-frame-parameter (selected-frame) 'menu-bar-lines 0)
+          (set-frame-size (selected-frame) width height))
+        (let ((here (point)))
+          (delete-other-windows)
+          (goto-char start)
+          (recenter-top-bottom 0)
+          (goto-char here)))
+    (wrong-number-of-arguments
+     (message "Failed to find blank-line bounds."))
+    (error
+     (message "Error: %s %s" (car err) (cdr err)))))
+
 ;;;; Footer
 
 (provide 'ab-treesit)
